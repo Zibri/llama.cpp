@@ -1387,7 +1387,14 @@ void ggml_vec_dot_q5_1_q8_1(int n, float * GGML_RESTRICT s, size_t bs, const voi
 #endif
 }
 
+extern void ggml_vec_dot_q8_0_q8_0_asm(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc);
+
 void ggml_vec_dot_q8_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
+#if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512VNNI__)
+    ggml_vec_dot_q8_0_q8_0_asm(n, s, bs, vx, bx, vy, by, nrc);
+    return;
+#endif
+
     const int qk = QK8_0;
     const int nb = n / qk;
 
